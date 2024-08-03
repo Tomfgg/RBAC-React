@@ -1,58 +1,43 @@
 import { useContext, useEffect, useState } from "react"
 import { AuthContext } from "./AuthProvider";
 import SinglePost from "./SinglePost";
-// import './PostsList.css'
-// import Button from 'react-bootstrap/Button';
+import Loading from "./Loading";
+import { useNavigate } from 'react-router-dom';
+const host = import.meta.env.VITE_HOST
+
 
 export default function PostsList({ }) {
     const { AuthToken } = useContext(AuthContext)
     const [posts, setPosts] = useState(null)
-    // const [skip, setSkip] = useState(0)
-    // const [noMorePosts, setNoMorePosts] = useState(false)
-    // if (!whosePosts) whosePosts = ''
+    const [loading, setLoading] = useState(true);
+    const navigate = useNavigate()
+    
     useEffect(() => {
         async function fetchPosts() {
-            let posts = await fetch(`http://127.0.0.1:5000/posts`, {
+            let posts = await fetch(`${host}/posts`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${AuthToken}`,
                 },
             });
+            if (!posts.ok) navigate('/error')
             posts = await posts.json()
-            console.log(posts)
             setPosts(posts)
-            // if (posts.length < 5) setNoMorePosts(true)
-            // setSkip(skip + 5)
+            setLoading(false)
+            
         }
         fetchPosts()
     }, [])
 
-    // console.log(noMorePosts)
-
-    // const decrementSkip = () => {
-    //     setSkip(skip - 1)
-    // }
+    
 
     const postsSetter = (id) => {
         const newPosts = posts.filter(post => post.id !== id)
         setPosts(newPosts)
     }
 
-    // const importSomePosts = async () => {
-    //     if (!noMorePosts) {
-    //         let newPosts = await fetch(`http://127.0.0.1:5000/posts/${whosePosts}?skip=${skip}`, {
-    //             method: 'GET',
-    //             headers: {
-    //                 'Authorization': `Bearer ${AuthToken}`,
-    //             },
-    //         });
-    //         newPosts = await newPosts.json()
-    //         console.log(newPosts)
-    //         setPosts([...posts, ...newPosts])
-    //         if (newPosts.length < 5) setNoMorePosts(true)
-    //         setSkip(skip + 5)
-    //     }
-    // }
+   
+    if (loading) return <Loading />
 
     return (<>
         <ul>
@@ -65,6 +50,5 @@ export default function PostsList({ }) {
                 )
             }
         </ul>
-        {/* {!noMorePosts && <Button className="show-more outline-secondary" onClick={importSomePosts}>Show More</Button>} */}
     </>)
 }

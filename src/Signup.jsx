@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-// import './Signup.css'
+const host = import.meta.env.VITE_HOST
 
 export default function Signup() {
     const navigate = useNavigate()
     const [formData, setFormData] = useState({
-        name: '',
+        userName: '',
         email: '',
         password: '',
         confirmPassword: ''
@@ -25,8 +25,7 @@ export default function Signup() {
         e.preventDefault();
         setError('')
 
-        // Basic validation
-        if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+        if (!formData.userName || !formData.email || !formData.password || !formData.confirmPassword) {
             setError('All fields are required');
             return;
         }
@@ -38,19 +37,18 @@ export default function Signup() {
             setError('Password should have at least 5 characters');
             return;
         }
-        if (formData.name.length < 3 || formData.name.length > 15) {
+        if (formData.userName.length < 3 || formData.userName.length > 15) {    
             setError('Username should have be between 3 and 15 characters');
             return;
         }
         const nameRegex = /^(?! )[A-Za-z]+(?: [A-Za-z]+)*(?<! )$/;
-        if (!nameRegex.test(formData.name)) {
+        if (!nameRegex.test(formData.userName)) {
             setError('Invalid name');
             return;
         }
 
-        // TODO: Implement form submission logic (e.g., send data to server)
         try {
-            const response = await fetch('http://127.0.0.1:5000/users', {
+            const response = await fetch(`${host}/users`, {
                 method: 'POST', // HTTP method
                 headers: {
                     'Content-Type': 'application/json',
@@ -61,13 +59,9 @@ export default function Signup() {
                 const error = await response.json()
                 throw new Error(error.error);
             }
-            // if (response.error) {
-            //     throw new Error('a7a'); 
-            // }
-
-            // Clear form
+            
             setFormData({
-                name: '',
+                userName: '',
                 email: '',
                 password: '',
             });
@@ -89,8 +83,8 @@ export default function Signup() {
                         <label className="block text-gray-700 font-medium">Username:</label>
                         <input
                             type="text"
-                            name="name"
-                            value={formData.name}
+                            name="userName"
+                            value={formData.userName}   
                             onChange={handleChange}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />

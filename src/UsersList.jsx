@@ -1,40 +1,45 @@
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "./AuthProvider";
+import { useNavigate } from 'react-router-dom';
+import Loading from "./Loading";
+const host = import.meta.env.VITE_HOST
+
 const UsersList = () => {
     const [users, setUsers] = useState(null)
     const { AuthToken } = useContext(AuthContext)
+    const [loading, setLoading] = useState(true);
+    const navigate = useNavigate()
 
     useEffect(() => {
-        // setLoading(true);
-        const fetchFriends = async () => {
-            let response = await fetch('http://127.0.0.1:5000/users/allUsers', {
+        const fetchUsers = async () => {
+            let response = await fetch(`${host}/users/allUsers`, {
                 method: 'GET',
                 headers: {
                     Authorization: `Bearer ${AuthToken}`
                 }
             })
+            if (!response.ok) navigate('/error')
             response = await response.json()
-            console.log(response)
             setUsers(response)
-            // setLoading(false)
+            setLoading(false)
         }
-        fetchFriends()
+        fetchUsers()
     }, [])
 
     const deleteAccount = async (id) => {
-        let response = await fetch(`http://127.0.0.1:5000/users/${id}`, {
+        let response = await fetch(`${host}/users/${id}`, {
             method: 'Delete',
             headers: {
                 Authorization: `Bearer ${AuthToken}`
             }
         })
+        if (!response.ok) navigate('/error')
         response = await response.json()
-        // console.log(response)
+
         setUsers(users.filter(user => user.id !== id))
     }
 
-    if(!users ) return <div>...Loading</div>
-    // if(users && ! users instanceof Array) return setUsers([users])
+    if (loading) return <Loading />
 
     return (
         <ul>
@@ -50,18 +55,19 @@ const UsersList = () => {
 const SingleUser = ({ theUser, deleteAccount }) => {
     const [user, setUser] = useState(theUser)
     const { AuthToken } = useContext(AuthContext)
+    const navigate = useNavigate()
 
     const setRole = async (role, id) => {
         const newRole = role === 'Admin' ? 'user' : 'admin'
-        let response = await fetch(`http://127.0.0.1:5000/users/${id}/${newRole}`, {
+        let response = await fetch(`${host}/users/${id}/${newRole}`, {
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${AuthToken}`
             }
         })
+        if (!response.ok) navigate('/error')
         response = await response.json()
-        console.log(response)
-        setUser({...user,role:response})
+        setUser({ ...user, role: response })
     }
 
     return (
@@ -83,7 +89,6 @@ const SingleUser = ({ theUser, deleteAccount }) => {
                     </button>
                 </div>
             </div>
-            {/* <div className="text-gray-600">{user.role}</div> */}
         </div>
     )
 }

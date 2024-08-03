@@ -1,6 +1,7 @@
 import React, { useState, createContext, useEffect } from 'react';
+const host = import.meta.env.VITE_HOST
 
-export const AuthContext = createContext()
+export const AuthContext = createContext()  
 
 export default function AuthProvider({ children }) {
     const [AuthToken, setAuthToken] = useState(localStorage.getItem('AuthToken'))
@@ -9,7 +10,7 @@ export default function AuthProvider({ children }) {
     useEffect(() => {
         if (!AuthToken) return setCurrentUser(null)
         async function getUser() {
-            let response = await fetch('http://127.0.0.1:5000/users', {
+            let response = await fetch(`${host}/users`, {
                 method: 'GET',
                 headers: {
                     Authorization: `Bearer ${AuthToken}`

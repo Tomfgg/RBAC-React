@@ -8,6 +8,7 @@ import Signup from "./Signup";
 import Login from "./Login";
 import PostForm from "./PostForm";
 import UsersList from "./UsersList";
+import ErrorPage from "./ErrorPage";
 
 function App() {
   const { AuthToken, currentUser } = useContext(AuthContext)
@@ -25,6 +26,7 @@ function App() {
         <Route path="/UsersList" element={(isAuth && currentUser?.role === 'SuperAdmin') ? <UsersList /> : <Error />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/error" element={<ErrorPage />} />
         <Route path="*" element={<Error />} />
       </Routes>
     </div>
